@@ -189,7 +189,7 @@ public class DefaultCoverageGenerator implements CoverageGenerator {
         if (cr.isGreenTest() || !coverageOptions.getPitConfig().skipFailingTests()) {
           try {
             Files.write(Paths.get("/home/cqse/jr_tia/pitest-ts/recorded_tests_ts_pit"),
-                    ("Recorded "+dateFormat.format(new Date())+": " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
+                    ("Recorded " + dateFormat.format(new Date()) + ": " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
                             .getBytes(),
                     StandardOpenOption.APPEND);
           } catch (IOException a) {
@@ -199,7 +199,7 @@ public class DefaultCoverageGenerator implements CoverageGenerator {
         } else {
           try {
             Files.write(Paths.get("/home/cqse/jr_tia/pitest-ts/skipped_tests_ts_pit"),
-                    ("Skipping "+dateFormat.format(new Date())+": " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
+                    ("Skipping " + dateFormat.format(new Date()) + ": " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
                             .getBytes(),
                     StandardOpenOption.APPEND);
           } catch (IOException a) {
