@@ -44,7 +44,10 @@ import java.net.ServerSocket;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Function;
@@ -179,15 +182,24 @@ public class DefaultCoverageGenerator implements CoverageGenerator {
       private final String[] spinner = new String[] { "\u0008/", "\u0008-",
           "\u0008\\", "\u0008|" };
       int i = 0;
+      private final DateFormat dateFormat = new SimpleDateFormat("dd-mm-yyyy hh:mm:ss");
 
       @Override
       public void apply(final CoverageResult cr) {
         if (cr.isGreenTest() || !coverageOptions.getPitConfig().skipFailingTests()) {
+          try {
+            Files.write(Paths.get("/home/cqse/jr_tia/pitest-ts/recorded_tests_ts_pit"),
+                    ("Recorded "+dateFormat.format(new Date())+": " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
+                            .getBytes(),
+                    StandardOpenOption.APPEND);
+          } catch (IOException a) {
+            a.printStackTrace();
+          }
           coverage.calculateClassCoverage(cr);
         } else {
           try {
             Files.write(Paths.get("/home/cqse/jr_tia/pitest-ts/skipped_tests_ts_pit"),
-                    ("Skipping: " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
+                    ("Skipping "+dateFormat.format(new Date())+": " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
                             .getBytes(),
                     StandardOpenOption.APPEND);
           } catch (IOException a) {
