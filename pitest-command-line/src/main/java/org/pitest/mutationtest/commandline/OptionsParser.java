@@ -14,48 +14,6 @@
  */
 package org.pitest.mutationtest.commandline;
 
-import static org.pitest.mutationtest.config.ConfigOption.AVOID_CALLS;
-import static org.pitest.mutationtest.config.ConfigOption.CHILD_JVM;
-import static org.pitest.mutationtest.config.ConfigOption.CLASSPATH;
-import static org.pitest.mutationtest.config.ConfigOption.CLASSPATH_FILE;
-import static org.pitest.mutationtest.config.ConfigOption.CODE_PATHS;
-import static org.pitest.mutationtest.config.ConfigOption.COVERAGE_THRESHOLD;
-import static org.pitest.mutationtest.config.ConfigOption.DEPENDENCY_DISTANCE;
-import static org.pitest.mutationtest.config.ConfigOption.EXCLUDED_CLASSES;
-import static org.pitest.mutationtest.config.ConfigOption.EXCLUDED_GROUPS;
-import static org.pitest.mutationtest.config.ConfigOption.EXCLUDED_METHOD;
-import static org.pitest.mutationtest.config.ConfigOption.EXCLUDED_TEST_CLASSES;
-import static org.pitest.mutationtest.config.ConfigOption.EXPORT_LINE_COVERAGE;
-import static org.pitest.mutationtest.config.ConfigOption.FAIL_WHEN_NOT_MUTATIONS;
-import static org.pitest.mutationtest.config.ConfigOption.FEATURES;
-import static org.pitest.mutationtest.config.ConfigOption.FULL_MUTATION_MATRIX;
-import static org.pitest.mutationtest.config.ConfigOption.HISTORY_INPUT_LOCATION;
-import static org.pitest.mutationtest.config.ConfigOption.HISTORY_OUTPUT_LOCATION;
-import static org.pitest.mutationtest.config.ConfigOption.INCLUDED_GROUPS;
-import static org.pitest.mutationtest.config.ConfigOption.INCLUDED_TEST_METHODS;
-import static org.pitest.mutationtest.config.ConfigOption.INCLUDE_LAUNCH_CLASSPATH;
-import static org.pitest.mutationtest.config.ConfigOption.JVM_PATH;
-import static org.pitest.mutationtest.config.ConfigOption.MAX_MUTATIONS_PER_CLASS;
-import static org.pitest.mutationtest.config.ConfigOption.MAX_SURVIVING;
-import static org.pitest.mutationtest.config.ConfigOption.MUTATIONS;
-import static org.pitest.mutationtest.config.ConfigOption.MUTATION_ENGINE;
-import static org.pitest.mutationtest.config.ConfigOption.MUTATION_THRESHOLD;
-import static org.pitest.mutationtest.config.ConfigOption.MUTATION_UNIT_SIZE;
-import static org.pitest.mutationtest.config.ConfigOption.OUTPUT_FORMATS;
-import static org.pitest.mutationtest.config.ConfigOption.PLUGIN_CONFIGURATION;
-import static org.pitest.mutationtest.config.ConfigOption.REPORT_DIR;
-import static org.pitest.mutationtest.config.ConfigOption.SOURCE_DIR;
-import static org.pitest.mutationtest.config.ConfigOption.TARGET_CLASSES;
-import static org.pitest.mutationtest.config.ConfigOption.TEST_FILTER;
-import static org.pitest.mutationtest.config.ConfigOption.TEST_PLUGIN;
-import static org.pitest.mutationtest.config.ConfigOption.THREADS;
-import static org.pitest.mutationtest.config.ConfigOption.TIMEOUT_CONST;
-import static org.pitest.mutationtest.config.ConfigOption.TIMEOUT_FACTOR;
-import static org.pitest.mutationtest.config.ConfigOption.TIME_STAMPED_REPORTS;
-import static org.pitest.mutationtest.config.ConfigOption.USE_CLASSPATH_JAR;
-import static org.pitest.mutationtest.config.ConfigOption.USE_INLINED_CODE_DETECTION;
-import static org.pitest.mutationtest.config.ConfigOption.VERBOSE;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -83,6 +41,8 @@ import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 import joptsimple.OptionSpecBuilder;
 import joptsimple.util.KeyValuePair;
+
+import static org.pitest.mutationtest.config.ConfigOption.*;
 
 public class OptionsParser {
 
@@ -118,6 +78,7 @@ public class OptionsParser {
   private final OptionSpec<String>                   includedGroupsSpec;
   private final OptionSpec<String>                   includedTestMethodsSpec;
   private final OptionSpec<Boolean>                  fullMutationMatrixSpec;
+  private final OptionSpec<Boolean>                  skipFailingTestsSpec;
   private final OptionSpec<Integer>                  mutationUnitSizeSpec;
   private final ArgumentAcceptingOptionSpec<Boolean> timestampedReportsSpec;
   private final ArgumentAcceptingOptionSpec<Boolean> detectInlinedCode;
@@ -306,6 +267,13 @@ public class OptionsParser {
             "Whether to create a full mutation matrix")
         .defaultsTo(FULL_MUTATION_MATRIX.getDefault(Boolean.class));
 
+    this.skipFailingTestsSpec = parserAccepts(SKIP_FAILING_TESTS)
+            .withRequiredArg()
+            .ofType(Boolean.class)
+            .describedAs(
+                    "Whether to skip failing tests in the initial coverage recording.")
+            .defaultsTo(SKIP_FAILING_TESTS.getDefault(Boolean.class));
+
     this.mutationUnitSizeSpec = parserAccepts(MUTATION_UNIT_SIZE)
         .withRequiredArg()
         .ofType(Integer.class)
@@ -387,7 +355,7 @@ public class OptionsParser {
     data.addChildJVMArgs(this.jvmArgs.values(userArgs));
     
     data.setFullMutationMatrix(this.fullMutationMatrixSpec.value(userArgs));
-
+    data.setSkipFailingTests(this.skipFailingTestsSpec.value(userArgs));
 
     data.setDetectInlinedCode(userArgs.has(this.detectInlinedCode)
         && userArgs.valueOf(this.detectInlinedCode));

@@ -151,6 +151,11 @@ public enum ConfigOption {
   FULL_MUTATION_MATRIX("fullMutationMatrix", false),
 
   /**
+   * Whether to skip failing tests in the initial coverage recording.
+   */
+  SKIP_FAILING_TESTS("skipFailingTests", false),
+
+  /**
    * Maximum number of mutations to include within a single unit of analysis.
    */
   MUTATION_UNIT_SIZE("mutationUnitSize", 0),
