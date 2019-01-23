@@ -15,16 +15,6 @@
 
 package org.pitest.coverage.execute;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.ServerSocket;
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Function;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-
 import org.pitest.classinfo.ClassInfo;
 import org.pitest.classpath.CodeSource;
 import org.pitest.coverage.CoverageData;
@@ -47,6 +37,19 @@ import org.pitest.util.SocketFinder;
 import org.pitest.util.StringUtil;
 import org.pitest.util.Timings;
 import org.pitest.util.Unchecked;
+
+import java.io.File;
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Function;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class DefaultCoverageGenerator implements CoverageGenerator {
 
@@ -181,6 +184,15 @@ public class DefaultCoverageGenerator implements CoverageGenerator {
       public void apply(final CoverageResult cr) {
         if (cr.isGreenTest() || !coverageOptions.getPitConfig().skipFailingTests()) {
           coverage.calculateClassCoverage(cr);
+        } else {
+          try {
+            Files.write(Paths.get("/home/cqse/jr_tia/pitest-ts/skipped_tests_ts_pit"),
+                    ("Skipping: " + cr.getTestUnitDescription().getQualifiedName() + StringUtil.newLine())
+                            .getBytes(),
+                    StandardOpenOption.APPEND);
+          } catch (IOException a) {
+            a.printStackTrace();
+          }
         }
         if (DefaultCoverageGenerator.this.showProgress) {
           System.out.printf("%s", this.spinner[this.i % this.spinner.length]);
