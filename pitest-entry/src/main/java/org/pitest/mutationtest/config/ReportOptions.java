@@ -251,6 +251,10 @@ public class ReportOptions {
         return classPathString.substring(0, classPathString.lastIndexOf('/') - 4) + "classes/java/testUtils";
       }
 
+      if (classPathString.contains("77069/lib/")) {
+        return classPathString.substring(0, classPathString.lastIndexOf('/') - 4) + "classes/java/main";
+      }
+
       return classPathString.substring(0, classPathString.lastIndexOf('/') - 10) + "classes";
     }).collect(Collectors.toList());
   }
