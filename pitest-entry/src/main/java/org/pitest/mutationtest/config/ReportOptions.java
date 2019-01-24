@@ -39,6 +39,8 @@ import org.pitest.classpath.PathFilter;
 import org.pitest.classpath.ProjectClassPaths;
 import org.pitest.functional.FCollection;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.pitest.functional.prelude.Prelude;
 import org.pitest.help.Help;
 import org.pitest.help.PitHelpError;
@@ -230,11 +232,27 @@ public class ReportOptions {
   }
 
   public ClassPath getClassPath() {
+    this.classPathElements = convertSpecialJarPathsToClassesPath(this.classPathElements);
+
     if (this.classPathElements != null) {
       return createClassPathFromElements();
     } else {
       return new ClassPath();
     }
+  }
+
+  private static Collection<String> convertSpecialJarPathsToClassesPath(Collection<String> classPathElements) {
+    return classPathElements.stream().map(classPathString -> {
+      if (!classPathString.contains("77069/") || !classPathString.endsWith(".jar")) {
+        return classPathString;
+      }
+
+      if (classPathString.endsWith("test-utils.jar")) {
+        return classPathString.substring(0, classPathString.lastIndexOf('/') - 4) + "classes/java/testUtils";
+      }
+
+      return classPathString.substring(0, classPathString.lastIndexOf('/') - 10) + "classes";
+    }).collect(Collectors.toList());
   }
 
   private ClassPath createClassPathFromElements() {
