@@ -51,6 +51,7 @@ public class XMLReportListener implements MutationResultListener {
 
   private final Writer out;
   private final boolean fullMutationMatrix;
+  private int mutationResultsCounter = 0;
 
   public XMLReportListener(final ResultOutputStrategy outputStrategy, boolean fullMutationMatrix) {
     this(outputStrategy.createWriterForFile("mutations.xml"), fullMutationMatrix);
@@ -70,6 +71,15 @@ public class XMLReportListener implements MutationResultListener {
   private void writeMutationResultXML(final MutationResult result) {
     write(makeNode(makeMutationNode(result), makeMutationAttributes(result),
         mutation) + "\n");
+    if (++mutationResultsCounter % 20 == 0) {
+      mutationResultsCounter = 0;
+      try {
+        out.flush();
+      } catch (IOException e) {
+        System.out.println("Could not write intermediate report.");
+        e.printStackTrace();
+      }
+    }
   }
 
   private String makeMutationAttributes(final MutationResult result) {
