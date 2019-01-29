@@ -232,9 +232,8 @@ public class ReportOptions {
   }
 
   public ClassPath getClassPath() {
-    this.classPathElements = convertSpecialJarPathsToClassesPath(this.classPathElements);
-
     if (this.classPathElements != null) {
+      this.classPathElements = convertSpecialJarPathsToClassesPath(this.classPathElements);
       return createClassPathFromElements();
     } else {
       return new ClassPath();
